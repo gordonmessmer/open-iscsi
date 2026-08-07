@@ -1,8 +1,7 @@
 /*
- * iSCSI event poll/loop 
+ * rtnetlink monitoring for network address changes
  *
- * Copyright (C) 2004 Dmitry Yusupov, Alex Aizman
- * maintained by open-iscsi@googlegroups.com
+ * Copyright (C) 2026 Gordon Messmer
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published
@@ -16,18 +15,11 @@
  *
  * See the file COPYING included with this distribution for more details.
  */
-#ifndef EVENT_POLL_H
-#define EVENT_POLL_H
+#ifndef NLINK_ROUTE_H
+#define NLINK_ROUTE_H
 
-struct iscsi_ipc;
-struct queue_task;
-
-int shutdown_callback(pid_t pid);
-void reap_proc(void);
-void reap_inc(void);
-void reap_track_reload_process(pid_t realod_proc_pid, void (*reload_done_callback)(void));
-void event_loop(struct iscsi_ipc *ipc, int control_fd, int mgmt_ipc_fd,
-		int nlink_route_fd);
-void event_loop_exit(struct queue_task *qtask);
+int nlink_route_init(void);
+void nlink_route_handle(int fd);
+void nlink_route_close(int fd);
 
 #endif

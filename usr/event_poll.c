@@ -38,6 +38,7 @@
 #include "actor.h"
 #include "initiator.h"
 #include "iscsi_err.h"
+#include "nlink_route.h"
 
 static unsigned int reap_count;
 
@@ -138,7 +139,8 @@ static int shutdown_wait_pids(void)
 #define POLL_CTRL	0
 #define POLL_IPC	1
 #define POLL_ALARM	2
-#define POLL_MAX	3
+#define POLL_NLROUTE	3
+#define POLL_MAX	4
 
 static volatile int event_loop_stop;
 static queue_task_t *shutdown_qtask; 
@@ -149,7 +151,8 @@ void event_loop_exit(queue_task_t *qtask)
 	event_loop_stop = 1;
 }
 
-void event_loop(struct iscsi_ipc *ipc, int control_fd, int mgmt_ipc_fd)
+void event_loop(struct iscsi_ipc *ipc, int control_fd, int mgmt_ipc_fd,
+		int nlink_route_fd)
 {
 	struct pollfd poll_array[POLL_MAX];
 	int res, has_shutdown_children = 0;
@@ -173,6 +176,8 @@ void event_loop(struct iscsi_ipc *ipc, int control_fd, int mgmt_ipc_fd)
 	poll_array[POLL_IPC].events = POLLIN;
 	poll_array[POLL_ALARM].fd = sig_fd;
 	poll_array[POLL_ALARM].events = POLLIN;
+	poll_array[POLL_NLROUTE].fd = nlink_route_fd;
+	poll_array[POLL_NLROUTE].events = nlink_route_fd >= 0 ? POLLIN : 0;
 
 	event_loop_stop = 0;
 	while (1) {
@@ -217,6 +222,9 @@ void event_loop(struct iscsi_ipc *ipc, int control_fd, int mgmt_ipc_fd)
 					log_debug(4, "Poll was woken by an alarm");
 				}
 			}
+
+			if (poll_array[POLL_NLROUTE].revents)
+				nlink_route_handle(nlink_route_fd);
 		} else if (res < 0) {
 			if (errno == EINTR) {
 				log_debug(1, "event_loop interrupted");

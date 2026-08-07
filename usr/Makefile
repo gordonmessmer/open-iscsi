@@ -78,7 +78,8 @@ ISCSI_LIB_OBJS = iscsi_util.o io.o auth.o iscsi_timer.o login.o log.o \
 	initiator_common.o iscsi_err.o flashnode.o uip_mgmt_ipc.o \
 	netlink.o
 # core initiator files
-INITIATOR_OBJS = initiator.o scsi.o actor.o event_poll.o mgmt_ipc.o kern_err_table.o
+INITIATOR_OBJS = initiator.o scsi.o actor.o event_poll.o mgmt_ipc.o kern_err_table.o \
+	nlink_route.o
 
 # fw boot files
 FW_BOOT_DIR = fwparam_ibft

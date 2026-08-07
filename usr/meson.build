@@ -30,7 +30,8 @@ initiator_srcs = [
   'actor.c',
   'event_poll.c',
   'mgmt_ipc.c',
-  'kern_err_table.c']
+  'kern_err_table.c',
+  'nlink_route.c']
 discovery_srcs = [
   'local_strings.c',
   'discovery.c']

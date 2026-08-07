@@ -570,7 +570,7 @@ int main(int argc, char *argv[])
 	 * Start Main Event Loop
 	 */
 	iscsi_initiator_init();
-	event_loop(ipc, control_fd, mgmt_ipc_fd);
+	event_loop(ipc, control_fd, mgmt_ipc_fd, -1);
 	ipc->ctldev_close();
 	mgmt_ipc_close(mgmt_ipc_fd);
 	free_initiator();

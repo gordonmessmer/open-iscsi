@@ -55,6 +55,7 @@
 #include "discoveryd.h"
 #include "iscsid_req.h"
 #include "iscsi_err.h"
+#include "nlink_route.h"
 
 /* global config info */
 struct iscsi_daemon_config daemon_config;
@@ -386,6 +387,7 @@ int main(int argc, char *argv[])
 	struct sigaction sa_old;
 	struct sigaction sa_new;
 	int control_fd;
+	int nlink_route_fd;
 	pid_t pid;
 	bool pid_file_specified = false;
 	bool no_pid_file_specified = false;
@@ -632,9 +634,16 @@ int main(int argc, char *argv[])
 	if (set_thread_io_flusher(1) == EINVAL)
 		log_info("prctl could not mark iscsid with the PR_SET_IO_FLUSHER flag, because the feature is not supported in this kernel. Will proceed, but iscsid may hang during session level recovery if memory is low.\n");
 
-	set_state_to_ready();
-	event_loop(ipc, control_fd, mgmt_ipc_fd);
+	nlink_route_fd = nlink_route_init();
+	if (nlink_route_fd < 0)
+		log_warning("Could not set up rtnetlink monitoring. "
+			    "Automatic login on network changes will "
+			    "not be available.");
 
+	set_state_to_ready();
+	event_loop(ipc, control_fd, mgmt_ipc_fd, nlink_route_fd);
+
+	nlink_route_close(nlink_route_fd);
 	idbm_terminate();
 	sysfs_cleanup();
 	ipc->ctldev_close();

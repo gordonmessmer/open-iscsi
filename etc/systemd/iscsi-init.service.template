@@ -1,5 +1,5 @@
 [Unit]
-Description=One time configuration for iscsi.service
+Description=One time configuration for iscsid.service
 ConditionPathExists=!/etc/iscsi/initiatorname.iscsi
 DefaultDependencies=no
 RequiresMountsFor=/etc/iscsi
